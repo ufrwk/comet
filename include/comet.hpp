@@ -19,6 +19,21 @@ constexpr const void* ident() noexcept {
 }
 }; // namespace comet
 
+/**
+ * @brief Define a stable type identity for use across module boundaries.
+ *
+ * This macro specializes `comet::type_ident<T>` with a fixed ID.
+ *
+ * Use it when `&typeid(T)` is not reliable (e.g., across DLL/plugin boundaries).
+ *
+ * @param Type The interface type to identify.
+ * @param ID   A non-zero constant castable to `const void*`.
+ *
+ * Example:
+ * @code
+ * COMET_DEFINE_TYPE_IDENT(IFoo, 123);
+ * @endcode
+ */
 #define COMET_DEFINE_TYPE_IDENT(Type, ID)             \
     static_assert((ID) != 0, "ID must be non-zero");  \
     namespace comet {                                 \
