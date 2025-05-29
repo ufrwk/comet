@@ -1,0 +1,37 @@
+Language: Cpp
+BasedOnStyle: LLVM
+
+ColumnLimit: 0
+
+IndentWidth: 4
+AccessModifierOffset: -4
+
+PointerAlignment: Left
+ReferenceAlignment: Left
+
+# 尾随的注释对齐
+AlignTrailingComments: true
+# 允许函数参数在一行
+AllowAllArgumentsOnNextLine: true
+# 允许函数声明的所有参数在放在一行
+AllowAllParametersOfDeclarationOnNextLine: true
+# 允许短的块放在同一行
+AllowShortBlocksOnASingleLine: Never
+# 允许短的case标签放在同一行
+AllowShortCaseLabelsOnASingleLine: false
+# 允许短的枚举放在同一行
+AllowShortEnumsOnASingleLine: false
+# 允许短的函数放在同一行
+AllowShortFunctionsOnASingleLine: Empty
+# 允许短的if语句保持在同一行
+AllowShortIfStatementsOnASingleLine: Never
+# 允许短的匿名函数lamda表达式放在同一行
+AllowShortLambdasOnASingleLine: Empty
+# 允许短的循环while保持在同一行
+AllowShortLoopsOnASingleLine: false
+
+# 缩进case body
+IndentCaseBlocks: true
+
+# 允许修改头文件顺序
+SortIncludes: false
