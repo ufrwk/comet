@@ -1,7 +1,7 @@
 ﻿#include "device.h"
 #include <iostream>
 
-class CLoggerModule : public CComBase<ILogger> {
+class CLoggerModule : public CComUnknown<ILogger> {
 public:
     void Log(const std::string& message) override {
         std::cout << "[Logger] " << message << "\n";
@@ -12,7 +12,7 @@ public:
     }
 };
 
-class CNetworkModule : public CComBase<INetwork> {
+class CNetworkModule : public CComUnknown<INetwork> {
 public:
     void Connect(const std::string& address) override {
         connected = true;

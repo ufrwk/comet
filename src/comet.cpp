@@ -7,10 +7,6 @@ public:
         delete this;
     }
 
-    void __SetHost(IComHost* host) override {
-        // unreachable
-    }
-
     void* __QueryInterface(const std::type_index& type) override {
         auto i = m_impl_table.find(type);
         if (i != m_impl_table.end()) {

@@ -2,33 +2,26 @@
 #include <typeindex>
 
 struct IComHost;
-template <class T>
-class CComBase;
-template <class T>
-class CComPtr;
-
 IComHost* NewComHost();
 
-struct IComBase {
-    friend struct IComHost;
+struct IComUnknown {
     template <class>
     friend class CComPtr;
     template <class>
-    friend class CComBase;
+    friend class CComUnknown;
 
 private:
-    virtual void __SetHost(IComHost* host) = 0;
     virtual void* __QueryInterface(const std::type_index& type) = 0;
 };
 
-struct IComHost : IComBase {
+struct IComHost : IComUnknown {
+public:
     virtual void Delete() = 0;
 
+public:
     template <class Interface, class Implement>
     Interface* Inject(Implement* impl) {
-        IComBase* base = impl; // must inherit from it
-
-        base->__SetHost(this);
+        impl->__SetComHost(this);
         void* ptr = this->__Inject(std::type_index(typeid(Interface)), impl);
         return reinterpret_cast<Interface*>(ptr);
     }
@@ -45,12 +38,31 @@ private:
 };
 
 template <class T>
+class CComUnknown : public T {
+    friend struct IComHost;
+
+private:
+    inline void __SetComHost(IComHost* host) {
+        m_host = host;
+    }
+    void* __QueryInterface(const std::type_index& type) override final {
+        if (auto* host = m_host) {
+            return host->__QueryInterface(type);
+        }
+        return nullptr;
+    }
+
+private:
+    IComHost* m_host{};
+};
+
+template <class T>
 class CComPtr final {
 public:
     template <class Other>
     CComPtr(const CComPtr<Other>& ptr) : CComPtr(ptr.get()) {
     }
-    CComPtr(IComBase* ptr) : m_impl(reinterpret_cast<T*>(ptr->__QueryInterface(std::type_index(typeid(T))))) {
+    CComPtr(IComUnknown* ptr) : m_impl(reinterpret_cast<T*>(ptr->__QueryInterface(std::type_index(typeid(T))))) {
     }
 
     T* get() const noexcept {
@@ -65,21 +77,4 @@ public:
 
 private:
     T* const m_impl;
-};
-
-template <class T>
-class CComBase : public T {
-private:
-    void __SetHost(IComHost* host) override final {
-        m_host = host;
-    }
-    void* __QueryInterface(const std::type_index& type) override final {
-        if (auto* host = m_host) {
-            return host->__QueryInterface(type);
-        }
-        return nullptr;
-    }
-
-private:
-    IComHost* m_host{};
 };

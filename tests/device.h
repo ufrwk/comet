@@ -3,7 +3,7 @@
 
 #include <string>
 
-struct IDevice : IComBase {
+struct IDevice : IComUnknown {
     virtual ~IDevice() = default;
 
     virtual const char* GetDeviceName() const = 0;
