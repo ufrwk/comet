@@ -16,7 +16,7 @@ Comet is ideal for games, tools, or modular services where component relationshi
 
 ### How It Works
 
-- Inherit your interfaces from `IIComUnknown`
+- Inherit your interfaces from `IComUnknown`
 - Implement them using `CComUnknown<YourInterface>`
 - Inject components into a host (`IComHost`)
 - Use `CComPtr<T>` to access other components within the same host
