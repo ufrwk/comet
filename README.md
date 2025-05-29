@@ -47,7 +47,7 @@ public:
     void Log(const std::string& msg) override {
         std::cout << "[Logger2] " << msg << "\n";
 
-        // Cross-module access (same host)
+        // internal cross-module access (same host)
         CComPtr<ILogger1> log1(this);
         log1->Log("Internal call from Logger2 to Logger1");
     }
