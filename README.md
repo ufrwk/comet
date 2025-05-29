@@ -1,5 +1,7 @@
 ﻿# Comet
 
+[中文说明](README_zh.md)
+
 **Comet** is a minimal C++11 component host system for lightweight runtime modularity.  
 It allows objects to register multiple interfaces into a local container and query each other without global context.
 
