@@ -8,7 +8,7 @@ Comet is ideal for games, tools, or modular services where component relationshi
 
 ### Key Features
 
-- Zero dependencies (only `<typeindex>` and `<unordered_map>`)
+- Zero header dependencies
 - No macros, no RTTI abuse
 - No base class pollution in business interfaces
 - Single-process, single-module design
@@ -27,22 +27,22 @@ Comet is ideal for games, tools, or modular services where component relationshi
 #include <comet.hpp>
 #include <iostream>
 
-struct ILogger1 : IComBase {
+struct ILogger1 : IComUnknown {
     virtual void Log(const std::string&) = 0;
 };
 
-struct ILogger2 : IComBase {
+struct ILogger2 : IComUnknown {
     virtual void Log(const std::string&) = 0;
 };
 
-class CLogger1 : public CComBase<ILogger1> {
+class CLogger1 : public CComUnknown<ILogger1> {
 public:
     void Log(const std::string& msg) override {
         std::cout << "[Logger1] " << msg << "\n";
     }
 };
 
-class CLogger2 : public CComBase<ILogger2> {
+class CLogger2 : public CComUnknown<ILogger2> {
 public:
     void Log(const std::string& msg) override {
         std::cout << "[Logger2] " << msg << "\n";
@@ -57,8 +57,8 @@ int main() {
     IComHost* host = NewComHost();
 
     // Install components
-    host->Inject<ILogger1>(new CLogger1());
-    host->Inject<ILogger2>(new CLogger2());
+    host->Attach<ILogger1>(new CLogger1());
+    host->Attach<ILogger2>(new CLogger2());
 
     // Access one component
     CComPtr<ILogger1> logger1(host);
@@ -69,8 +69,8 @@ int main() {
     logger2->Log("Hello from Logger2");
 
     // Uninstall components
-    delete static_cast<CLogger1*>(host->Enject<ILogger1>());
-    delete static_cast<CLogger2*>(host->Enject<ILogger2>());
+    delete static_cast<CLogger1*>(host->Detach<ILogger1>());
+    delete static_cast<CLogger2*>(host->Detach<ILogger2>());
     host->Delete();
 
     return 0;

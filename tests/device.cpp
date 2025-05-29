@@ -35,13 +35,13 @@ private:
 };
 
 void SetupDevice(IComHost* host) {
-    host->Inject<ILogger>(new CLoggerModule());
-    host->Inject<INetwork>(new CNetworkModule());
+    host->Attach<ILogger>(new CLoggerModule());
+    host->Attach<INetwork>(new CNetworkModule());
 };
 
 void RemoveDevice(IComHost* host) {
-    auto* p1 = host->Enject<ILogger>();
+    auto* p1 = host->Detach<ILogger>();
     delete p1;
-    auto* p2 = host->Enject<INetwork>();
+    auto* p2 = host->Detach<INetwork>();
     delete p2;
 }
