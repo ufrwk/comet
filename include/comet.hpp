@@ -19,6 +19,17 @@ constexpr const void* ident() noexcept {
 }
 }; // namespace comet
 
+#define COMET_DEFINE_TYPE_IDENT(Type, ID)             \
+    static_assert((ID) != 0, "ID must be non-zero");  \
+    namespace comet {                                 \
+    template <>                                       \
+    struct type_ident<Type> {                         \
+        static constexpr const void* get() noexcept { \
+            return reinterpret_cast<const void*>(ID); \
+        }                                             \
+    };                                                \
+    }
+
 // Common base interface for components that support host-based interface lookup
 struct IComUnknown {
     template <class>
