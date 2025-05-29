@@ -8,7 +8,7 @@ Comet is ideal for games, tools, or modular services where component relationshi
 
 ### Key Features
 
-- Zero header dependencies
+- No 3rd dependencies
 - No macros, no RTTI abuse
 - No base class pollution in business interfaces
 - Single-process, single-module design
@@ -16,8 +16,8 @@ Comet is ideal for games, tools, or modular services where component relationshi
 
 ### How It Works
 
-- Inherit your interfaces from `IComBase`
-- Implement them using `CComBase<YourInterface>`
+- Inherit your interfaces from `IIComUnknown`
+- Implement them using `CComUnknown<YourInterface>`
 - Inject components into a host (`IComHost`)
 - Use `CComPtr<T>` to access other components within the same host
 
