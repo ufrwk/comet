@@ -1,6 +1,5 @@
 ﻿#include "comet.hpp"
 
-#include <cassert>
 #include <unordered_map>
 
 class CComHost final : public IComHost {
@@ -16,11 +15,7 @@ public:
         delete this;
     }
 
-    void* __QueryInterface(const std::type_info* type) override {
-        if (type == &typeid(IComHost)) {
-            return static_cast<IComHost*>(this);
-        }
-
+    void* __QueryInterface(const void* type) override {
         auto i = m_impl_table.find(type);
         if (i != m_impl_table.end()) {
             return i->second;
@@ -28,7 +23,7 @@ public:
         return nullptr;
     }
 
-    void* __Detach(const std::type_info* type) override {
+    void* __Detach(const void* type) override {
         auto i = m_impl_table.find(type);
         if (i != m_impl_table.end()) {
             void* impl = i->second;
@@ -38,11 +33,7 @@ public:
         return nullptr;
     }
 
-    void* __Attach(const std::type_info* type, void* impl) override {
-        if (type == &typeid(IComHost)) {
-            assert(false);
-            return nullptr; // forbid registering the host itself
-        }
+    void* __Attach(const void* type, void* impl) override {
         if (m_impl_table.emplace(type, impl).second) {
             return impl;
         }
@@ -50,7 +41,7 @@ public:
     }
 
 private:
-    std::unordered_map<const std::type_info*, void*> m_impl_table;
+    std::unordered_map<const void*, void*> m_impl_table;
 };
 
 IComHost* NewComHost(unsigned int hint) {
