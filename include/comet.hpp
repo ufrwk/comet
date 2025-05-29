@@ -1,12 +1,9 @@
 ﻿#pragma once
+#include <typeinfo>
 
 struct IComHost;
 // Creates a new standalone component container (host) with optional slot hint
 IComHost* NewComHost(unsigned int hint = 64);
-
-namespace std {
-class type_info;
-};
 
 namespace comet {
 template <class T>
