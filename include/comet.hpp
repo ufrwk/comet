@@ -1,9 +1,14 @@
 ﻿#pragma once
 #include <typeinfo>
+#include "traits.hpp"
 
 struct IComHost;
 // Creates a new standalone component container (host) with optional slot hint
 IComHost* NewComHost(unsigned int hint = 64);
+
+struct IComDeleter {
+    virtual void OnDelete() = 0;
+};
 
 namespace comet {
 template <class T>
@@ -17,6 +22,27 @@ template <class T>
 constexpr const void* ident() noexcept {
     return type_ident<T>::get();
 }
+
+template <class T>
+class CComDeleter final : public IComDeleter {
+public:
+    void OnDelete() override {
+        m_func();
+        delete this;
+    }
+
+    static IComDeleter* Create(T&& func) {
+        return new CComDeleter<T>(forward<T>(func));
+    }
+
+protected:
+    CComDeleter(T&& func) : m_func(forward<T>(func)) {
+    }
+
+private:
+    typename decay<T>::type m_func;
+};
+
 }; // namespace comet
 
 /**
@@ -65,6 +91,9 @@ public:
     virtual void Ref() noexcept = 0;
     virtual void Deref() noexcept = 0;
 
+    // like `atexit`
+    virtual void AtDelete(IComDeleter* deleter) = 0;
+
     // upward lookup
     virtual bool AddChild(IComHost* child) = 0;
     virtual bool RemoveChild(IComHost* child) = 0;
@@ -95,6 +124,49 @@ public:
     Interface* Detach() {
         void* impl = this->__Detach(comet::ident<Interface>());
         return reinterpret_cast<Interface*>(impl);
+    }
+
+    template <class T>
+    void DeferDelete(T&& func) {
+        this->AtDelete(comet::CComDeleter<T>::Create(comet::forward<T>(func)));
+    }
+
+    template <class Interface, class Implement, class T>
+    Interface* AttachWithDeleter(Implement* impl, T&& func) {
+        Interface* intfptr = this->Attach<Interface, Implement>(impl);
+        if (!intfptr) {
+            return nullptr; // failed
+        }
+
+        struct Callable {
+            Implement* impl;
+            typename comet::decay<T>::type func;
+            void operator()() {
+                func(impl);
+            }
+        };
+
+        DeferDelete(Callable{impl, comet::forward<T>(func)});
+        return intfptr;
+    }
+
+    template <class Interface, class Implement, class T>
+    Interface* RawAttachWithDeleter(Implement* impl, T&& func) {
+        Interface* intfptr = this->RawAttach<Interface, Implement>(impl);
+        if (!intfptr) {
+            return nullptr; // failed
+        }
+
+        struct Callable {
+            Implement* impl;
+            typename comet::decay<T>::type func;
+            void operator()() {
+                func(impl);
+            }
+        };
+
+        DeferDelete(Callable{impl, comet::forward<T>(func)});
+        return intfptr;
     }
 };
 

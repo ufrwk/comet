@@ -36,12 +36,15 @@ private:
 
 void SetupDevice(IComHost* host) {
     host->Attach<ILogger>(new CLoggerModule());
-    host->Attach<INetwork>(new CNetworkModule());
+
+    // auto delete
+    host->AttachWithDeleter<INetwork>(new CNetworkModule(), [](CNetworkModule* p) {
+        delete p;
+    });
 };
 
 void RemoveDevice(IComHost* host) {
+    // manual delete
     auto* p1 = host->Detach<ILogger>();
     delete p1;
-    auto* p2 = host->Detach<INetwork>();
-    delete p2;
 }

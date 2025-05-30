@@ -1,6 +1,7 @@
 ﻿#include "comet.hpp"
 
 #include <vector>
+#include <functional>
 #include <unordered_map>
 
 #include <cassert>
@@ -15,7 +16,15 @@ public:
     }
 
     ~CComHost() {
+        for (auto&& func : m_deleter) {
+            func->OnDelete();
+        }
+
         for (IComHost* child : m_children) {
+            if (this != child->GetParent()) {
+                std::abort();
+            }
+            child->__SetParent(nullptr);
             child->Deref();
         }
     }
@@ -29,6 +38,10 @@ public:
         if (--m_refc == 0) {
             delete this;
         }
+    }
+
+    void AtDelete(IComDeleter* deleter) override {
+        m_deleter.push_back(deleter);
     }
 
     bool AddChild(IComHost* child) override {
@@ -112,6 +125,7 @@ private:
     IComHost* m_parent{};
     std::unordered_map<const void*, void*> m_impl_table;
     std::vector<IComHost*> m_children;
+    std::vector<IComDeleter*> m_deleter;
 };
 
 IComHost* NewComHost(unsigned int hint) {
