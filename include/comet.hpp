@@ -59,7 +59,8 @@ private:
 // Component container that manages registration and cross-interface lookup
 struct IComHost : IComUnknown {
 public:
-    virtual void Delete() noexcept = 0;
+    virtual void Ref() noexcept = 0;
+    virtual void Deref() noexcept = 0;
 
 public:
     // Attaches a component that supports cross-component access (host-aware)

@@ -11,8 +11,14 @@ public:
     }
 
 public:
-    void Delete() noexcept override {
-        delete this;
+    void Ref() noexcept override {
+        m_refc++;
+    }
+
+    void Deref() noexcept override {
+        if (--m_refc == 0) {
+            delete this;
+        }
     }
 
     void* __QueryInterface(const void* type) override {
@@ -42,6 +48,7 @@ public:
 
 private:
     std::unordered_map<const void*, void*> m_impl_table;
+    int m_refc = 1;
 };
 
 IComHost* NewComHost(unsigned int hint) {

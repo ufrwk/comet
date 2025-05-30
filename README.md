@@ -73,7 +73,7 @@ int main() {
     // Uninstall components
     delete static_cast<CLogger1*>(host->Detach<ILogger1>());
     delete static_cast<CLogger2*>(host->Detach<ILogger2>());
-    host->Delete();
+    host->Deref();
 
     return 0;
 }

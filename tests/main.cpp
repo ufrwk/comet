@@ -17,6 +17,6 @@ int main(int argc, char* argv[]) {
     }
     RemoveDevice(host);
 
-    host->Delete();
+    host->Deref();
     return 0;
 }
