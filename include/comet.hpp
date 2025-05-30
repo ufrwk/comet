@@ -91,7 +91,7 @@ public:
     virtual void Ref() noexcept = 0;
     virtual void Deref() noexcept = 0;
 
-    // like `atexit`
+    // LIFO, like `atexit`
     virtual void AtDelete(IComDeleter* deleter) = 0;
 
     // upward lookup

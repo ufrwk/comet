@@ -16,7 +16,8 @@ public:
     }
 
     ~CComHost() {
-        for (auto&& func : m_deleter) {
+        for (auto i = m_deleter.rbegin(); i != m_deleter.rend(); ++i) {
+            auto& func = *i;
             func->OnDelete();
         }
 
