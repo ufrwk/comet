@@ -109,7 +109,7 @@ public:
     template <class Interface, class Implement>
     Interface* Attach(Implement* impl) {
         impl->__SetComHost(this);
-        return RawAttach<Interface, Implement>(impl);
+        return this->RawAttach<Interface, Implement>(impl);
     }
     // Attaches a passive component that does not access others
     template <class Interface, class Implement>
@@ -146,7 +146,7 @@ public:
             }
         };
 
-        DeferDelete(Callable{impl, comet::forward<T>(func)});
+        this->DeferDelete(Callable{impl, comet::forward<T>(func)});
         return intfptr;
     }
 
@@ -165,7 +165,7 @@ public:
             }
         };
 
-        DeferDelete(Callable{impl, comet::forward<T>(func)});
+        this->DeferDelete(Callable{impl, comet::forward<T>(func)});
         return intfptr;
     }
 };
