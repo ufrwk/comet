@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <typeinfo>
-#include "traits.hpp"
+#include "comet/traits.hpp"
 
 struct IComHost;
 // Creates a new standalone component container (host) with optional slot hint
