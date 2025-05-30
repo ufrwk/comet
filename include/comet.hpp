@@ -47,6 +47,7 @@ constexpr const void* ident() noexcept {
 
 // Common base interface for components that support host-based interface lookup
 struct IComUnknown {
+    friend class CComHost;
     template <class>
     friend class CComPtr;
     template <class>
@@ -58,9 +59,21 @@ private:
 
 // Component container that manages registration and cross-interface lookup
 struct IComHost : IComUnknown {
+    friend class CComHost;
+
 public:
     virtual void Ref() noexcept = 0;
     virtual void Deref() noexcept = 0;
+
+    // upward lookup
+    virtual bool AddChild(IComHost* child) = 0;
+    virtual bool RemoveChild(IComHost* child) = 0;
+    virtual IComHost* GetParent() const noexcept = 0;
+
+private:
+    virtual void* __Detach(const void* type) = 0;
+    virtual void* __Attach(const void* type, void* impl) = 0;
+    virtual bool __SetParent(IComHost* parent) = 0;
 
 public:
     // Attaches a component that supports cross-component access (host-aware)
@@ -83,10 +96,6 @@ public:
         void* impl = this->__Detach(comet::ident<Interface>());
         return reinterpret_cast<Interface*>(impl);
     }
-
-private:
-    virtual void* __Detach(const void* type) = 0;
-    virtual void* __Attach(const void* type, void* impl) = 0;
 };
 
 // Default implementation for IComUnknown enabling cross-component queries via host
@@ -96,17 +105,17 @@ class CComUnknown : public T {
 
 private:
     void __SetComHost(IComHost* host) noexcept {
-        m_host = host;
+        m_com_host = host;
     }
     void* __QueryInterface(const void* type) override final {
-        if (auto* host = m_host) {
+        if (auto* host = m_com_host) {
             return host->__QueryInterface(type);
         }
         return nullptr;
     }
 
 private:
-    IComHost* m_host{};
+    IComHost* m_com_host{};
 };
 
 // A lightweight wrapper for interface-based component lookup
